@@ -1,5 +1,5 @@
 // Princess Polina — service worker: cache-first offline support.
-const CACHE = 'polina-v1';
+const CACHE = 'polina-v2';
 const ASSETS = [
   './',
   './index.html',

@@ -19,14 +19,14 @@ export const PHYS = {
   gravity: 830,
   fallGravity: 1010,
   maxFall: 270,
-  jumpVel: -238,
-  runJumpBonus: -30,
+  jumpVel: -300,       // ~3.4 tiles held; +run bonus ~4.4 tiles (block tops reachable)
+  runJumpBonus: -40,
   jumpCutFactor: 0.45,
   coyoteTime: 0.09,
   jumpBuffer: 0.12,
   wallSlideMax: 78,
   wallJumpVX: 150,
-  wallJumpVY: -218,
+  wallJumpVY: -270,
   rollSpeed: 190,
   rollTime: 0.34,
   poundSpeed: 360,
@@ -36,7 +36,7 @@ export const PHYS = {
   swimAccel: 300,
   swimMax: 96,
   swimGravity: 160,
-  swimJump: -130,
+  swimJump: -150,
   climbSpeed: 72
 };
 

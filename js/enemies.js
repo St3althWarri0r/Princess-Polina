@@ -121,7 +121,7 @@ export class Enemy extends Entity {
       const bonus = [10, 20, 40, 80, 100, 200, 400, 1000][p.stompChain - 1] || 10;
       this.g.particles.text(this.x + this.w / 2, this.y - 4, String(bonus), '#ffd042');
       if (p.stompChain >= 7) this.g.addLife(1);
-      p.bounce(pounding ? -240 : (this.g.input.down('jump') ? -250 : -170));
+      p.bounce(pounding ? -280 : (this.g.input.down('jump') ? -300 : -200));
       return;
     }
     if (pounding && !this.stompable) { this.damage(2, 'pound'); p.bounce(-200); return; }

@@ -243,12 +243,12 @@ export class Boss extends Enemy {
     const stomping = p.vy > 40 && (p.y + p.h) < this.y + this.h * 0.5;
     const pounding = p.state === 'pound' && p.poundPhase === 1;
     if ((stomping || pounding) && this.vulnerable) {
-      if (this.bossHit(pounding ? 2 : 1)) { p.bounce(-230); return; }
+      if (this.bossHit(pounding ? 2 : 1)) { p.bounce(-280); return; }
     }
     if ((p.state === 'dash' && p.boltDash) && this.vulnerable) {
       if (this.bossHit(1)) return;
     }
-    if (stomping && !this.vulnerable) { p.bounce(-200); sfx.bump(); return; }
+    if (stomping && !this.vulnerable) { p.bounce(-240); sfx.bump(); return; }
     if (this.contactDamage && this.hitCd <= 0.55) p.hurt(this.x + this.w / 2);
   }
 

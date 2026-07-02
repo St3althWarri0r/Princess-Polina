@@ -150,11 +150,27 @@ export class PowerUp extends Entity {
     this.power = power;
     this.t = 0;
     this.rise = rise ? 16 : 0; // rising out of a block
+    this.dir = Math.random() < 0.5 ? -1 : 1;
   }
   update(dt) {
     this.t += dt;
     if (this.rise > 0) { this.rise -= 22 * dt; this.y -= 22 * dt; return; }
-    this.fall(dt);
+    // wander like a living blessing: walks off blocks so it's always reachable
+    this.x += this.dir * 26 * dt;
+    const aheadX = this.dir > 0 ? this.x + this.w + 1 : this.x - 1;
+    if (tileSolid(this.g.tileAt(Math.floor(aheadX / TILE), Math.floor((this.y + this.h / 2) / TILE))) ||
+      this.x < 2 || this.x + this.w > this.g.levelW * TILE - 2) {
+      this.dir *= -1;
+    }
+    const grounded = this.fall(dt);
+    if (grounded) {
+      // drop off ledges, but turn back at deep pits so it never falls out of the level
+      const ftx = Math.floor((this.dir > 0 ? this.x + this.w + 2 : this.x - 2) / TILE);
+      const fty = Math.floor((this.y + this.h) / TILE);
+      let support = false;
+      for (let d = 0; d < 6; d++) if (tileSolid(this.g.tileAt(ftx, fty + d))) { support = true; break; }
+      if (!support) this.dir *= -1;
+    }
     if (this.overlapsPlayer()) {
       this.dead = true;
       this.g.player.applyPower(this.power);
@@ -181,7 +197,7 @@ export class Spring extends Entity {
     if (this.animT > 0) this.animT -= dt;
     const p = this.g.player;
     if (!p.dead && p.vy >= 0 && aabb({ x: this.x - 1, y: this.y - 4, w: this.w + 2, h: this.h + 4 }, p.hitbox)) {
-      p.bounce(-330);
+      p.bounce(-430);
       p.springT = 0.3;
       this.animT = 0.25;
       sfx.jump();
@@ -213,7 +229,8 @@ export class Checkpoint extends Entity {
 
 // --- Radiant Gate: level goal ----------------------------------------------------
 export class Gate extends Entity {
-  constructor(g, x, y) { super(g, x, y - 16, 16, 32); this.t = 0; this.triggered = false; }
+  // hitbox extends well above the arch so higher jumps can't sail over it
+  constructor(g, x, y) { super(g, x, y - 48, 16, 64); this.t = 0; this.triggered = false; }
   update(dt) {
     this.t += dt;
     if (!this.triggered && this.overlapsPlayer()) {
@@ -223,14 +240,15 @@ export class Gate extends Entity {
   }
   draw(ctx, cx, cy) {
     const img = getSprite('gate');
+    const baseY = this.y + this.h - 16; // arch sits at the bottom of the tall hitbox
     // glow
     ctx.globalAlpha = 0.25 + 0.12 * Math.sin(this.t * 3);
     ctx.fillStyle = '#ffd042';
     ctx.beginPath();
-    ctx.arc(this.x + 8 - cx, this.y + 16 - cy, 16, 0, 7);
+    ctx.arc(this.x + 8 - cx, baseY + 8 - cy, 16, 0, 7);
     ctx.fill();
     ctx.globalAlpha = 1;
-    ctx.drawImage(img, Math.round(this.x - cx), Math.round(this.y - cy + 16));
+    ctx.drawImage(img, Math.round(this.x - cx), Math.round(baseY - cy));
   }
 }
 
