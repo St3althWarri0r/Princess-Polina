@@ -126,7 +126,7 @@ export class Enemy extends Entity {
     }
     if (pounding && !this.stompable) { this.damage(2, 'pound'); p.bounce(-200); return; }
 
-    if (this.contactDamage) p.hurt(this.x + this.w / 2);
+    if (this.contactDamage && this.softOverlapsPlayer()) p.hurt(this.x + this.w / 2);
   }
 
   baseUpdate(dt) {
@@ -339,7 +339,7 @@ export class Armored extends Enemy {
       if (p.state === 'roll' || p.state === 'dash' || (p.state === 'pound' && p.poundPhase === 1)) {
         this.damage(1, 'dash');
         if (p.state === 'pound') p.bounce(-200);
-      } else {
+      } else if (this.softOverlapsPlayer()) {
         p.hurt(this.x + this.w / 2);
       }
     }
@@ -442,7 +442,7 @@ export class Golem extends Enemy {
     if (!p.dead && this.overlapsPlayer() && !this.isFrozen) {
       if (p.state === 'pound' && p.poundPhase === 1) { this.damage(p.power === 'bear' ? 3 : 1, 'pound'); p.bounce(-220); }
       else if (p.state === 'dash' && p.boltDash) this.damage(2, 'dash');
-      else p.hurt(this.x + this.w / 2);
+      else if (this.softOverlapsPlayer()) p.hurt(this.x + this.w / 2);
     }
   }
   interactPlayer() { /* in update */ }
@@ -552,7 +552,7 @@ export class Spiky extends Enemy {
     const p = this.g.player;
     if (!p.dead && this.overlapsPlayer() && !this.isFrozen) {
       if (p.state === 'dash' && p.boltDash) this.damage(2, 'dash');
-      else p.hurt(this.x + this.w / 2);
+      else if (this.softOverlapsPlayer()) p.hurt(this.x + this.w / 2);
     }
   }
   interactPlayer() { /* in update */ }
@@ -686,7 +686,7 @@ export class Wisp extends Enemy {
     const dodge = p.state === 'dash' && p.boltDash;
     if (!p.dead && this.overlapsPlayer()) {
       if (dodge || (p.power === 'fire' && p.state === 'roll')) this.damage(2, 'dash');
-      else if (this.contactDamage) p.hurt(this.x + this.w / 2);
+      else if (this.contactDamage && this.softOverlapsPlayer()) p.hurt(this.x + this.w / 2);
     }
   }
   interactPlayer() { /* custom above */ }
@@ -796,7 +796,7 @@ export class Turret extends Enemy {
     if (!pl.dead && this.overlapsPlayer()) {
       if (pl.state === 'pound' && pl.poundPhase === 1) { this.damage(2, 'pound'); pl.bounce(-200); }
       else if (pl.state === 'dash' || pl.state === 'roll') this.damage(1, 'dash');
-      else pl.hurt(this.x + this.w / 2);
+      else if (this.softOverlapsPlayer()) pl.hurt(this.x + this.w / 2);
     }
   }
   interactPlayer() { /* custom */ }

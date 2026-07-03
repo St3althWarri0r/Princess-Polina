@@ -6,27 +6,36 @@ export const VIEW_H = 240;          // 15 tiles
 export const FPS = 60;
 export const DT = 1 / FPS;
 
-// Physics tuning (px/sec, px/sec^2). Tuned for tight, momentum-driven feel.
+// Physics tuning (px/sec, px/sec^2), modeled on the classic momentum-tier
+// system: jump height and reach scale in three discrete tiers with ground
+// speed (standing ~4.4 tiles high / ~5 wide, jog ~5.4/8, full run ~6.4/11).
+// The arc is near-symmetric with a brief hover at the apex, and horizontal
+// stops are effectively instant — precision lives in the level, not the physics.
 export const PHYS = {
-  walkSpeed: 88,
-  runSpeed: 148,
-  accel: 460,
-  runAccel: 560,
-  decel: 620,
-  airAccel: 430,
-  airDecel: 180,
-  skidDecel: 900,
-  gravity: 830,
-  fallGravity: 960,
-  maxFall: 270,
-  jumpVel: -345,       // ~4.5 tiles held: floating block tops need no running start
-  runJumpBonus: -45,   // ~5.7 tiles with a sprint
+  walkSpeed: 80,
+  runSpeed: 165,
+  accel: 600,          // snappy up to walk speed
+  runAccel: 135,       // slow build past walk speed: full run needs real runway
+  decel: 2000,         // near-instant stop
+  airAccel: 500,
+  airDecel: 100,       // air momentum mostly persists
+  skidDecel: 1600,
+  gravUp: 780,
+  gravDown: 760,       // descent imperceptibly gentler than ascent
+  apexGravScale: 0.35, // brief hover at the top of the arc
+  apexBand: 42,        // |vy| below this counts as the apex
+  maxFall: 280,
+  jumpV1: -330,        // standing/walking: ~4.4 tiles
+  jumpV2: -366,        // jogging: ~5.4 tiles
+  jumpV3: -399,        // full run: ~6.4 tiles
+  jumpTier2: 95,       // |vx| thresholds for the higher tiers
+  jumpTier3: 135,
   jumpCutFactor: 0.45,
   coyoteTime: 0.13,
   jumpBuffer: 0.14,
   wallSlideMax: 78,
-  wallJumpVX: 150,
-  wallJumpVY: -300,
+  wallJumpVX: 160,
+  wallJumpVY: -330,
   rollSpeed: 190,
   rollTime: 0.34,
   poundSpeed: 360,

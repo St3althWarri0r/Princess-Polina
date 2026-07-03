@@ -61,21 +61,28 @@ export const LEVELS = [
   // WORLD 1 — EMERALD MEADOWS (run & jump fundamentals)
   // ======================================================================
   {
+    // 1-1 follows a full cadence: training wheels (floored trench, penalty 0),
+    // the standard challenge (a 3-wide pit), expansions (wider pit; then an
+    // intercept over the pit), punctuation rewards, an evolution (chained pits
+    // around a patroller), and a climax before the gate.
     id: '1-1', world: 1, stage: 1, timeLimit: 300,
     rows: J(
-      seg(16, 2, [[12, 3, 'S'], [10, 10, '?'], [12, 12, 'c'], [11, 13, 'c']]),
-      seg(14, 2, [[12, 3, '1'], [10, 5, 'B?B'], [12, 10, 'c.c'], [8, 11, 'c']]),
+      seg(14, 4, [[10, 3, 'S'], [10, 7, 'c'], [10, 9, 'c'], [10, 11, 'c']]),   // runway
+      seg(4, 2, [[12, 1, 'c.c']]),                                             // training trench
+      seg(8, 4, [[9, 4, '1'], [10, 6, 'c']]),                                  // first enemy, alone
+      seg(10, 2, [[10, 4, '?'], [12, 7, 'c'], [11, 8, 'c']]),                  // first blocks
+      pit(3),                                                                  // STANDARD: d=3
+      seg(8, 2, [[12, 3, 'c'], [12, 5, 'c']]),                                 // breather
+      pit(4),                                                                  // expansion: d=4
+      seg(12, 2, [[10, 4, '?P?'], [9, 5, 'h'], [12, 9, 'c']]),                 // reward: crown + heart on top
+      pit(4, [[7, 1, '3']]),                                                   // expansion: intercept over the gap
+      seg(8, 2, [[12, 3, 'k']]),                                               // checkpoint
       pit(3),
-      seg(12, 2, [[12, 2, 'c'], [10, 4, '?P?'], [12, 9, '1']]),
-      seg(10, 4, [[10, 2, 'c.c.c'], [9, 7, '2']]),
-      seg(12, 6, [[8, 2, 'c.c'], [7, 6, 'C'], [5, 9, 'Cg']]),
-      pit(4, [[6, 0, 'CC'], [10, 2, 'C']]),
-      seg(14, 2, [[12, 2, 'k'], [12, 6, '1'], [10, 8, '??'], [12, 11, '2']]),
-      pit(3, [[9, 0, 'C']]),
-      seg(12, 2, [[12, 2, 'c'], [12, 4, 'c'], [12, 6, 'c'], [8, 8, 'X']]),
-      seg(8, 4, [[10, 2, '1']]),
-      seg(12, 6, [[8, 3, 'c'], [8, 5, 'h'], [8, 8, 'm']]),
-      seg(14, 2, [[12, 6, 'G']])
+      seg(4, 2, [[12, 1, '1']]),                                               // evolution: island patroller
+      pit(3),
+      seg(12, 2, [[9, 2, 'CC'], [7, 5, 'CC'], [8, 3, 'c'], [6, 5, 'c.c'], [6, 7, 'g']]), // reward by fun
+      pit(5, [[12, 2, 'C']]),                                                  // climax: d=5 with a soft step
+      seg(16, 2, [[12, 4, '2'], [8, 7, 'X'], [12, 11, 'G']])
     )
   },
   {

@@ -249,7 +249,7 @@ export class Boss extends Enemy {
       if (this.bossHit(1)) return;
     }
     if (stomping && !this.vulnerable) { p.bounce(-240); sfx.bump(); return; }
-    if (this.contactDamage && this.hitCd <= 0.55) p.hurt(this.x + this.w / 2);
+    if (this.contactDamage && this.hitCd <= 0.55 && this.softOverlapsPlayer()) p.hurt(this.x + this.w / 2);
   }
 
   checkProjectiles() {

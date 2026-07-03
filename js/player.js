@@ -206,7 +206,7 @@ export class Player {
     const g = this.g;
     if (this.dead) {
       this.deathT += dt;
-      this.vy += PHYS.fallGravity * dt;
+      this.vy += PHYS.gravDown * dt;
       this.y += this.vy * dt;
       return;
     }
@@ -261,7 +261,7 @@ export class Player {
     if (this.state === 'climb') {
       if (!climbHere || this.jumpBuf > 0) {
         this.state = 'normal';
-        if (this.jumpBuf > 0) { this.jumpBuf = 0; this.vy = PHYS.jumpVel * 0.85; this.jumping = true; sfx.jump(); g.stats.jumps++; }
+        if (this.jumpBuf > 0) { this.jumpBuf = 0; this.vy = PHYS.jumpV1 * 0.9; this.jumping = true; sfx.jump(); g.stats.jumps++; }
       } else {
         this.vx = (inp.right - inp.left) * PHYS.climbSpeed * 0.7;
         this.vy = (inp.down - inp.up) * PHYS.climbSpeed;
@@ -275,7 +275,7 @@ export class Player {
     if (this.state === 'roll') {
       this.stateT -= dt;
       this.vx = this.facing * PHYS.rollSpeed;
-      if (!this.grounded) this.vy += PHYS.gravity * gravScale * dt;
+      if (!this.grounded) this.vy += PHYS.gravDown * gravScale * dt;
       if (this.stateT <= 0 && this.canStand()) this.state = 'normal';
       else if (this.stateT <= -0.6) this.forceUnstuck();
     } else if (this.state === 'dash') {
@@ -300,7 +300,11 @@ export class Player {
       const wish = (inp.right ? 1 : 0) - (inp.left ? 1 : 0);
       if (wish !== 0) this.facing = wish;
 
-      let accel = this.grounded ? (runHeld ? PHYS.runAccel : PHYS.accel) : PHYS.airAccel;
+      // tiered acceleration: snappy up to walk speed, then a slow build to full
+      // run — top speed takes real runway to earn
+      let accel = this.grounded
+        ? (Math.abs(this.vx) < PHYS.walkSpeed ? PHYS.accel : PHYS.runAccel)
+        : PHYS.airAccel;
       let decel = this.grounded ? PHYS.decel : PHYS.airDecel;
       if (this.onIce && this.grounded) { accel *= 0.35; decel *= 0.12; }
       if (this.inWater) { accel = PHYS.swimAccel; decel = PHYS.swimAccel * 0.5; }
@@ -333,8 +337,10 @@ export class Player {
           this.anim = 'swimStroke'; this.animT = 0;
         }
       } else {
-        const rising = this.vy < 0;
-        let grav = rising && this.jumping && inp.jump ? PHYS.gravity : PHYS.fallGravity;
+        // near-symmetric arc with a brief hover at the apex; variable height
+        // comes from the jump-cut on release, not asymmetric gravity
+        let grav = this.vy < 0 ? PHYS.gravUp : PHYS.gravDown;
+        if (Math.abs(this.vy) < PHYS.apexBand && this.jumping) grav *= PHYS.apexGravScale;
         grav *= gravScale;
         if (this.power === POWER.WIND && this.vy > 0 && inp.jump) grav *= 0.4;
         this.vy += grav * dt;
@@ -361,9 +367,11 @@ export class Player {
       if (this.jumpBuf > 0 && !this.inWater) {
         if (this.grounded || this.coyote > 0) {
           this.jumpBuf = 0;
-          const runBonus = Math.abs(this.vx) > PHYS.walkSpeed + 10 ? PHYS.runJumpBonus : 0;
-          const windBonus = this.power === POWER.WIND ? -40 : 0;
-          this.vy = PHYS.jumpVel + runBonus + windBonus;
+          // jump height comes in momentum tiers
+          const spd = Math.abs(this.vx);
+          let jv = spd > PHYS.jumpTier3 ? PHYS.jumpV3 : spd > PHYS.jumpTier2 ? PHYS.jumpV2 : PHYS.jumpV1;
+          if (this.power === POWER.WIND) jv -= 30;
+          this.vy = jv;
           this.jumping = true;
           this.grounded = false;
           this.coyote = 0;
@@ -380,7 +388,7 @@ export class Player {
         } else if (this.has('doublejump') && this.jumpsUsed < 1) {
           this.jumpBuf = 0;
           this.jumpsUsed++;
-          this.vy = PHYS.jumpVel * 0.92;
+          this.vy = PHYS.jumpV1 * 0.95;
           this.jumping = true;
           sfx.doubleJump(); g.stats.jumps++;
           g.particles.burst(cx, this.y + this.h, 7, { color: ['#fff6ec', '#ffd9f0'], maxSpeed: 60 });

@@ -17,7 +17,11 @@ export class Entity {
     this.solidGround = true;
   }
   get hitbox() { return { x: this.x, y: this.y, w: this.w, h: this.h }; }
+  // "soft size": the box that can HURT the player is smaller than the sprite,
+  // so near-misses feel like misses (favor the player, always)
+  get softHitbox() { return { x: this.x + 2, y: this.y + 3, w: Math.max(2, this.w - 4), h: Math.max(2, this.h - 3) }; }
   overlapsPlayer() { return !this.g.player.dead && aabb(this.hitbox, this.g.player.hitbox); }
+  softOverlapsPlayer() { return !this.g.player.dead && aabb(this.softHitbox, this.g.player.hitbox); }
   update(dt) { /* override */ }
   draw(ctx, cx, cy) { /* override */ }
 
@@ -229,8 +233,8 @@ export class Checkpoint extends Entity {
 
 // --- Radiant Gate: level goal ----------------------------------------------------
 export class Gate extends Entity {
-  // hitbox extends well above the arch so higher jumps can't sail over it
-  constructor(g, x, y) { super(g, x, y - 48, 16, 64); this.t = 0; this.triggered = false; }
+  // the goal is a full-height line, like classic goal posts: no jump clears it
+  constructor(g, x, y) { super(g, x, y - 176, 16, 192); this.t = 0; this.triggered = false; }
   update(dt) {
     this.t += dt;
     if (!this.triggered && this.overlapsPlayer()) {
@@ -339,7 +343,7 @@ export class Projectile extends Entity {
 
     if (this.fromPlayer) {
       // enemy hits handled in game.js (needs enemy list)
-    } else if (this.overlapsPlayer()) {
+    } else if (this.softOverlapsPlayer()) {
       if (this.g.player.hurt(this.x)) { this.dead = true; }
     }
   }
