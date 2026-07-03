@@ -13,6 +13,8 @@
 - Pushing changes to `.github/workflows/` on `main` may be silently dropped
   by the git proxy (scope rule); use the GitHub API (MCP push_files) for
   workflow-file changes to main.
+- The GitHub account was renamed (shuffman95 → St3althWarri0r); Pages URLs
+  do NOT redirect after a rename — always use the current owner's URL.
 - **Always bump `CACHE` in `sw.js`** (polina-vN) with any gameplay change,
   or installed clients keep playing the old version from the service-worker
   cache. Players must fully close and reopen the game to pick up updates.
